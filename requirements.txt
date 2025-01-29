@@ -1,0 +1,4 @@
+kokoro>=0.2.3
+soundfile
+IPython
+flask

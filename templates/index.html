@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text to French!</title>
+  <style>
+    .loader {
+      border: 16px solid #f3f3f3; /* Light grey */
+      border-top: 16px solid #3498db; /* Blue */
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 2s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+    <h2>Text to French!</h2>
+    <textarea id="french-text" spellcheck="false" lang="fr-FR" placeholder="Type french here!" cols="100" rows="5"></textarea>
+    <button id="play-sound">play french</button>
+    <div id='spinner' class="loader" style="display: none"></div> 
+    <p id='sound' style="font-size: 60px; display: none">🔊</p>
+    <script>
+
+
+var spinner = document.getElementById('spinner')
+var sound = document.getElementById('sound')
+var el = document.getElementById('play-sound')
+function playAudio(audio){
+  return new Promise(res=>{
+    audio.play()
+    audio.onended = res
+  })
+}
+
+function toggleDisplay(element) {
+  element.style.display = element.style.display == 'none' ? 'flex' : 'none' 
+}
+
+
+// TODO: improve speed by breaking the text into smaller chunks
+el.addEventListener('click', async ()=>{
+  el.setAttribute('disabled', 'true')
+  toggleDisplay(spinner)
+  var frenchText = document.getElementById('french-text').value.replace('\n', ' ')
+  const response = await fetch("/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({"text": frenchText})
+  });
+  console.log(response)
+  const readableStream = response.body;
+  const reader = readableStream.getReader();
+  const chunks = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  const audioBlob = new Blob(chunks, { type: 'audio/wav' });
+  const audioUrl = URL.createObjectURL(audioBlob);
+  const a0 = new Audio(audioUrl);
+  toggleDisplay(spinner)
+  toggleDisplay(sound)
+  await playAudio(a0);
+  el.removeAttribute('disabled')
+  toggleDisplay(sound)
+})
+
+    </script>
+</body>
+</html>
