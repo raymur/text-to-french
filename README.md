@@ -12,6 +12,7 @@ go to localhost:5000 in your browser and type in text that you want to hear with
 
 
 https://github.com/user-attachments/assets/75937a37-cef1-44e2-9ace-630ddfbf28f9
+
 (Also used this as an opportunity to practice javascript outside of modern web frameworks)
 
 
